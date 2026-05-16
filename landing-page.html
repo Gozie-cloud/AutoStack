@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoStack — AI Automation Community</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080808;
+  --bg2: #0f0f0f;
+  --bg3: #161616;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --accent: #C8F542;
+  --accent2: #a8d424;
+  --text: #f0f0f0;
+  --muted: #888;
+  --muted2: #555;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.1; }
+
+/* NOISE OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 4rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,8,8,0.85);
+  backdrop-filter: blur(16px);
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.logo span { color: var(--accent); }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-links a {
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  background: var(--accent);
+  color: #080808;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0.55rem 1.25rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+.nav-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(200,245,66,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(200,245,66,0.08);
+  border: 1px solid rgba(200,245,66,0.2);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+.hero h1 {
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--accent);
+  position: relative;
+}
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--muted);
+  max-width: 540px;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #080808;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.15s;
+}
+.btn-primary:hover { background: var(--accent2); transform: translateY(-2px); }
+.btn-secondary {
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+.btn-secondary:hover { color: var(--text); }
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  margin-top: 4rem;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.stat-div { width: 1px; height: 36px; background: var(--border2); }
+
+/* TICKER */
+.ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  padding: 0.75rem 0;
+  position: relative;
+  z-index: 1;
+}
+.ticker {
+  display: flex;
+  gap: 3rem;
+  animation: ticker 30s linear infinite;
+  width: max-content;
+}
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--muted);
+}
+.ticker-item strong { color: var(--accent); font-family: 'Syne', sans-serif; }
+.ticker-dot { color: var(--muted2); }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* SECTIONS */
+section { position: relative; z-index: 1; }
+.section-inner { max-width: 1100px; margin: 0 auto; padding: 6rem 2rem; }
+.section-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+.section-sub {
+  font-size: 1rem;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* WHAT YOU GET */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+.feature-card {
+  background: var(--bg2);
+  padding: 2rem;
+  transition: background 0.2s;
+}
+.feature-card:hover { background: var(--bg3); }
+.feature-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(200,245,66,0.08);
+  border: 1px solid rgba(200,245,66,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 1.25rem;
+}
+.feature-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+.feature-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* COURSE OUTLINE */
+.course-steps { display: flex; flex-direction: column; gap: 0; margin-top: 3rem; }
+.course-step {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 1.5rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+  transition: background 0.2s;
+}
+.course-step:last-child { border-bottom: none; }
+.step-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--border2);
+  line-height: 1;
+  padding-top: 4px;
+}
+.step-content h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+.step-content p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.step-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(200,245,66,0.08);
+  color: var(--accent);
+  border: 1px solid rgba(200,245,66,0.15);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* LEADERBOARD */
+.lb-section { background: var(--bg2); }
+.lb-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; margin-top: 3rem; }
+.lb-list { display: flex; flex-direction: column; gap: 10px; }
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+.lb-row:hover { border-color: var(--border2); }
+.lb-row.top { border-color: rgba(200,245,66,0.2); background: rgba(200,245,66,0.04); }
+.lb-rank-badge {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  width: 32px;
+  text-align: center;
+}
+.lb-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.lb-name { flex: 1; font-size: 14px; font-weight: 500; }
+.lb-location { font-size: 12px; color: var(--muted); }
+.lb-amount {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent);
+}
+.lb-right { display: flex; flex-direction: column; gap: 1rem; }
+.wins-feed { display: flex; flex-direction: column; gap: 10px; }
+.win-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+.win-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.win-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(200,245,66,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--accent);
+}
+.win-name { font-size: 13px; font-weight: 500; }
+.win-time { font-size: 11px; color: var(--muted); margin-left: auto; }
+.win-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.win-text strong { color: var(--accent); font-family: 'Syne', sans-serif; }
+
+/* PRICING */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 3rem;
+}
+.price-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.price-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+.price-card.featured {
+  border-color: rgba(200,245,66,0.3);
+  background: rgba(200,245,66,0.03);
+}
+.price-tier { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.price-amount {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+}
+.price-amount span { font-size: 14px; font-weight: 400; color: var(--muted); }
+.price-perks { display: flex; flex-direction: column; gap: 10px; }
+.perk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.perk::before {
+  content: '✓';
+  width: 18px; height: 18px;
+  background: rgba(200,245,66,0.1);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.price-btn {
+  display: block;
+  text-align: center;
+  padding: 0.85rem;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 1px solid var(--border2);
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+}
+.price-btn:hover { background: var(--bg3); }
+.price-btn.accent { background: var(--accent); color: #080808; border-color: var(--accent); }
+.price-btn.accent:hover { background: var(--accent2); }
+
+/* CTA */
+.cta-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.cta-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 800px; height: 400px;
+  background: radial-gradient(ellipse, rgba(200,245,66,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta-section h2 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+.cta-section p { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; }
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+}
+footer p { font-size: 13px; color: var(--muted2); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero-stats { gap: 1.5rem; }
+  .lb-wrap { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Auto<span>Stack</span></div>
+  <div class="nav-links">
+    <a href="#course">The Course</a>
+    <a href="#community">Community</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <a href="#pricing" class="nav-cta">Join Now →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">Now open for founding members</div>
+  <h1>Build income with<br><em>AI automation</em></h1>
+  <p class="hero-sub">From zero to a working AI automation business. Learn the systems, find the clients, close the deals — and do it alongside people actually doing it.</p>
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">Join the community →</a>
+    <a href="#course" class="btn-secondary">See what's inside ↓</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">5+</div>
+      <div class="stat-label">Course modules</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat">
+      <div class="stat-num">Monthly</div>
+      <div class="stat-label">Leaderboard reset</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat">
+      <div class="stat-num">₦25k</div>
+      <div class="stat-label">Starting from /month</div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <div class="ticker-item">🏆 <strong>Chidi O.</strong> closed <strong>₦180,000</strong> this month <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Amina K.</strong> landed her first automation client <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Tunde M.</strong> closed <strong>₦120,000</strong> in week 3 <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Fatima D.</strong> built her first lead machine <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Sola B.</strong> signed 2 retainer clients <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Chidi O.</strong> closed <strong>₦180,000</strong> this month <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Amina K.</strong> landed her first automation client <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Tunde M.</strong> closed <strong>₦120,000</strong> in week 3 <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Fatima D.</strong> built her first lead machine <span class="ticker-dot">·</span></div>
+    <div class="ticker-item">🏆 <strong>Sola B.</strong> signed 2 retainer clients <span class="ticker-dot">·</span></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="community">
+  <div class="section-inner">
+    <div class="section-tag">What you get</div>
+    <h2 class="section-title">Not a course.<br>A whole ecosystem.</h2>
+    <p class="section-sub">The course is just the beginning. What keeps members growing is the community, the accountability, and the competitive edge.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎬</div>
+        <h3>Episode-based course</h3>
+        <p>New episodes drop regularly. Not a dump — a structured journey from AI basics to running a real automation business.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Monthly leaderboard</h3>
+        <p>Top 10 earners ranked every month. Post your wins, climb the board, get recognized publicly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Active community</h3>
+        <p>Ask questions, share tools, get feedback on your outreach — from people at every stage of the journey.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Wins channel</h3>
+        <p>Members share closed deals publicly. This is motivation, proof, and your network all in one channel.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Constant updates</h3>
+        <p>AI moves fast. New tools, new strategies, new episodes — you never fall behind when you stay inside.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Sales system included</h3>
+        <p>Not just automation — you'll have a complete outreach and sales process to convert prospects into paying clients.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSE -->
+<section id="course" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-tag">The curriculum</div>
+    <h2 class="section-title">From LLMs to<br>closed deals.</h2>
+    <p class="section-sub">A complete pipeline. Not theory — every module is something you can execute and make money from immediately.</p>
+    <div class="course-steps">
+      <div class="course-step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-tag">Foundation</div>
+          <h3>Understanding LLMs & AI Automation</h3>
+          <p>What LLMs actually are, how they work, and the exact automation opportunities hiding in plain sight. No fluff — just what you need to get started.</p>
+        </div>
+      </div>
+      <div class="course-step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-tag">Lead Generation</div>
+          <h3>Building your lead finding machine</h3>
+          <p>Automate finding potential clients at scale. By the end of this module you'll have a system feeding you leads daily — before you've even sold anything.</p>
+        </div>
+      </div>
+      <div class="course-step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-tag">Vibe Coding</div>
+          <h3>Building websites with AI</h3>
+          <p>Use AI to build and ship websites fast. No CS degree needed. This is your service — the thing clients will pay you for.</p>
+        </div>
+      </div>
+      <div class="course-step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-tag">Client Acquisition</div>
+          <h3>Finding businesses with no or bad websites</h3>
+          <p>A systematic way to identify businesses losing money because of their online presence — and position yourself as the solution.</p>
+        </div>
+      </div>
+      <div class="course-step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <div class="step-tag">Closing</div>
+          <h3>Outreach & sales system</h3>
+          <p>How to reach out, follow up, handle objections and close. A complete sales process you implement from day one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEADERBOARD -->
+<section>
+  <div class="section-inner">
+    <div class="section-tag">Community proof</div>
+    <h2 class="section-title">Real people.<br>Real numbers.</h2>
+    <p class="section-sub">Every month the top earners are ranked. This is what keeps members accountable — and what proves this actually works.</p>
+    <div class="lb-wrap">
+      <div class="lb-list">
+        <div class="lb-row top">
+          <div class="lb-rank-badge">🥇</div>
+          <div class="lb-avatar">CO</div>
+          <div style="flex:1">
+            <div class="lb-name">Chidi O.</div>
+            <div class="lb-location">Lagos</div>
+          </div>
+          <div class="lb-amount">₦180,000</div>
+        </div>
+        <div class="lb-row top">
+          <div class="lb-rank-badge">🥈</div>
+          <div class="lb-avatar">AK</div>
+          <div style="flex:1">
+            <div class="lb-name">Amina K.</div>
+            <div class="lb-location">Abuja</div>
+          </div>
+          <div class="lb-amount">₦132,000</div>
+        </div>
+        <div class="lb-row top">
+          <div class="lb-rank-badge">🥉</div>
+          <div class="lb-avatar">TM</div>
+          <div style="flex:1">
+            <div class="lb-name">Tunde M.</div>
+            <div class="lb-location">Port Harcourt</div>
+          </div>
+          <div class="lb-amount">₦106,000</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank-badge" style="color:var(--muted)">4</div>
+          <div class="lb-avatar">SB</div>
+          <div style="flex:1">
+            <div class="lb-name">Sola B.</div>
+            <div class="lb-location">Ibadan</div>
+          </div>
+          <div class="lb-amount">₦75,000</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank-badge" style="color:var(--muted)">5</div>
+          <div class="lb-avatar">FD</div>
+          <div style="flex:1">
+            <div class="lb-name">Fatima D.</div>
+            <div class="lb-location">Kano</div>
+          </div>
+          <div class="lb-amount">₦51,000</div>
+        </div>
+      </div>
+      <div class="lb-right">
+        <p style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Latest wins</p>
+        <div class="wins-feed">
+          <div class="win-card">
+            <div class="win-header">
+              <div class="win-avatar">CO</div>
+              <div class="win-name">Chidi O.</div>
+              <div class="win-time">2h ago</div>
+            </div>
+            <div class="win-text">Closed a restaurant in VI for a full website rebuild + automation. <strong>₦85,000</strong> upfront, ₦20k retainer monthly 🔥</div>
+          </div>
+          <div class="win-card">
+            <div class="win-header">
+              <div class="win-avatar">AK</div>
+              <div class="win-name">Amina K.</div>
+              <div class="win-time">1d ago</div>
+            </div>
+            <div class="win-text">Used the lead machine from module 2 and got 3 replies in one day. Closed 1 already. <strong>₦60,000</strong> deal 💪</div>
+          </div>
+          <div class="win-card">
+            <div class="win-header">
+              <div class="win-avatar">TM</div>
+              <div class="win-name">Tunde M.</div>
+              <div class="win-time">3d ago</div>
+            </div>
+            <div class="win-text">Week 3 inside and already hit <strong>₦120,000</strong> this month. The vibe coding module changed everything for me.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-tag">Membership</div>
+    <h2 class="section-title">Pick your level.<br>Start today.</h2>
+    <p class="section-sub">Cancel anytime. No long-term commitment. Just show up, do the work, and the results follow.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div>
+          <div class="price-tier">Starter</div>
+          <div class="price-amount">₦25,000 <span>/mo</span></div>
+        </div>
+        <div class="price-perks">
+          <div class="perk">All course episodes</div>
+          <div class="perk">Community access</div>
+          <div class="perk">Wins channel</div>
+          <div class="perk">Monthly leaderboard</div>
+        </div>
+        <a href="#" class="price-btn">Get started</a>
+      </div>
+      <div class="price-card featured">
+        <div>
+          <div class="price-tier" style="color:var(--accent)">Pro — most popular</div>
+          <div class="price-amount">₦45,000 <span>/mo</span></div>
+        </div>
+        <div class="price-perks">
+          <div class="perk">Everything in Starter</div>
+          <div class="perk">Monthly live Q&A session</div>
+          <div class="perk">Deal review calls</div>
+          <div class="perk">Early episode drops</div>
+          <div class="perk">Pro-only channel</div>
+        </div>
+        <a href="#" class="price-btn accent">Join Pro →</a>
+      </div>
+      <div class="price-card">
+        <div>
+          <div class="price-tier">Elite</div>
+          <div class="price-amount">₦90,000 <span>/mo</span></div>
+        </div>
+        <div class="price-perks">
+          <div class="perk">Everything in Pro</div>
+          <div class="perk">Hot seat coaching</div>
+          <div class="perk">Private Elite channel</div>
+          <div class="perk">Referral network access</div>
+          <div class="perk">Direct access to founder</div>
+        </div>
+        <a href="#" class="price-btn">Apply for Elite</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="section-tag">Ready?</div>
+  <h2>Stop watching.<br>Start earning.</h2>
+  <p>The people on the leaderboard were beginners once. They just started.</p>
+  <a href="#pricing" class="btn-primary" style="font-size:16px; padding: 1rem 2.5rem;">Join the community →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Auto<span>Stack</span></div>
+  <p>© 2025 AutoStack. Built for Nigeria's next generation of automation entrepreneurs.</p>
+</footer>
+
+</body>
+</html>
